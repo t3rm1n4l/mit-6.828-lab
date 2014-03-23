@@ -56,10 +56,29 @@ mon_kerninfo(int argc, char **argv, struct Trapframe *tf)
 	return 0;
 }
 
+#define bt_arg(N) ((ebp + N + 1) < last_ebp ? ebp[N + 1] : 0)
+
 int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
-	// Your code here.
+    uint32_t *ebp, *last_ebp;
+    ebp = (uint32_t *) read_ebp();
+
+    cprintf("Stack backtrace:\n");
+    while (ebp) {
+        last_ebp = (uint32_t *) ebp[0];
+        cprintf("ebp %08x eip %08x args %08x %08x %08x %08x %08x\n",
+                ebp,
+                ebp[1],
+                bt_arg(1),
+                bt_arg(2),
+                bt_arg(3),
+                bt_arg(4),
+                bt_arg(5));
+
+        ebp = last_ebp;
+    }
+
 	return 0;
 }
 
